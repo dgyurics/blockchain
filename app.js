@@ -1,7 +1,8 @@
 'use strict';
 
-let SHA256 = require("crypto-js/sha256");
-let communication = require("./communication");
+let SHA256 = require('crypto-js/sha256');
+let p2p = require('./p2p');
+let http = require('./rest');
 
 let blockchain = []; // in-memory blockchain
 
@@ -57,13 +58,22 @@ function isValidChain(chain) {
   // not yet implemented
 }
 
+function addBlock(newBlock) {
+  // not yet implemented
+}
+
 function replaceChain(newBlocks) {
     // currently checking for longest chain, however this should be chain with most work
     if (isValidChain(newBlocks) && newBlocks.length > blockchain.length) {
         blockchain = newBlocks;
-        // broadcast that chain has been updated
+        // broadcast
     }
 };
 
 blockchain.push(genesisBlock);
-communication.init();
+p2p.init();
+http.init();
+
+module.exports.blockchain = blockchain;
+module.exports.generateBlock = generateBlock;
+module.exports.addBlock = addBlock;
