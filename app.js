@@ -59,7 +59,10 @@ function isValidChain(chain) {
 }
 
 function addBlock(newBlock) {
-  // not yet implemented
+  if (isValidNewBlock(newBlock, getLatestBlock())) {
+    blockchain.push(newBlock);
+    p2p.broadcast('new block mined');
+  }
 }
 
 function replaceChain(newBlocks) {

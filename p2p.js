@@ -5,8 +5,8 @@ let WebSocket = require('ws');
 const p2p_port = process.env.P2P_PORT || 6001;
 
 const message_types = Object.freeze({
-    GET_LATEST_BLOCK:   Symbol('getLatestBlock'),
-    GET_ALL_BLOCKS:  Symbol('getAllBlocks'),
+    GET_LATEST_BLOCK: Symbol('getLatestBlock'),
+    GET_ALL_BLOCKS: Symbol('getAllBlocks'),
     BROADCAST_BLOCK: Symbol('broadcastBlock')
 });
 
@@ -34,7 +34,7 @@ function newConnectionHandler(ws) {
 /* executed each time a message is sent */
 function messageHandler(ws) {
   ws.on('message', (message) => {
-    ws.send(`message received: ${message}`)
+    console.log(`message received: ${message}`);
   });
 }
 
@@ -67,7 +67,17 @@ function connectToPeers(newPeers) {
   })
 };
 
-function broadcast() {}
+/* convert message to string and broadcast to peer */
+function write(ws, message) {
+  ws.send(JSON.stringify(message));
+}
+
+/* broadcast message to all peers */
+function broadcast(message) {
+  sockets.forEach(socket => {
+    write(socket, message);
+  });
+}
 
 module.exports.message_types = message_types;
 module.exports.broadcast = broadcast;
