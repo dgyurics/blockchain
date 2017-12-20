@@ -12,7 +12,7 @@ function init() {
   app.use(bodyParser.json());
 
   app.get('/', (req, res) => {
-      res.send('welcome');
+    res.send('welcome');
   });
 
   app.get('/blocks', (req, res) => {
@@ -26,12 +26,12 @@ function init() {
   });
 
   app.get('/peers', (req, res) => {
-      res.send(p2p.sockets.map(s => s._socket.remoteAddress + ':' + s._socket.remotePort));
+    res.send(p2p.sockets.map(s => s._socket.remoteAddress + ':' + s._socket.remotePort));
   });
 
   app.post('/addPeer', (req, res) => {
-      p2p.connectToPeers(req.body);
-      res.send();
+    p2p.connectToPeers(req.body);
+    res.send();
   });
 
   app.listen(http_port, () => console.log('http port: ' + http_port));

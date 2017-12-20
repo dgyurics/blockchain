@@ -40,15 +40,15 @@ function generateBlock(blockData) {
 }
 
 function getLatestBlock() {
-  return blockchain[blockchain.length-1];
+  return blockchain[blockchain.length - 1];
 }
 
 function isValidNewBlock(newBlock, previousBlock) {
-  if(previousBlock.index + 1 !== newBlock.index)
+  if (previousBlock.index + 1 !== newBlock.index)
     return false;
-  if(previousBlock.hash !== newBlock.previousHash)
+  if (previousBlock.hash !== newBlock.previousHash)
     return false;
-  if(calculateBlockHash(newBlock) !== newBlock.hash)
+  if (calculateBlockHash(newBlock) !== newBlock.hash)
     return false;
 
   return true;
@@ -66,11 +66,11 @@ function addBlock(newBlock) {
 }
 
 function replaceChain(newBlocks) {
-    // currently checking for longest chain, however this should be chain with most work
-    if (isValidChain(newBlocks) && newBlocks.length > blockchain.length) {
-        blockchain = newBlocks;
-        // broadcast
-    }
+  // currently checking for longest chain, however this should be chain with most work
+  if (isValidChain(newBlocks) && newBlocks.length > blockchain.length) {
+    blockchain = newBlocks;
+    // broadcast
+  }
 };
 
 blockchain.push(genesisBlock);

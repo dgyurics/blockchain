@@ -5,9 +5,9 @@ let WebSocket = require('ws');
 const p2p_port = process.env.P2P_PORT || 6001;
 
 const message_types = Object.freeze({
-    GET_LATEST_BLOCK: Symbol('getLatestBlock'),
-    GET_ALL_BLOCKS: Symbol('getAllBlocks'),
-    BROADCAST_BLOCK: Symbol('broadcastBlock')
+  GET_LATEST_BLOCK: Symbol('getLatestBlock'),
+  GET_ALL_BLOCKS: Symbol('getAllBlocks'),
+  BROADCAST_BLOCK: Symbol('broadcastBlock')
 });
 
 let sockets = [];
