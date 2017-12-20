@@ -20,9 +20,9 @@ function init() {
   });
 
   app.post('/mineBlock', (req, res) => {
-      let newBlock = blockchain.generateBlock(req.body.data);
-      blockchain.addBlock(newBlock);
-      res.send();
+    let newBlock = blockchain.generateBlock(req.body.data);
+    blockchain.addBlock(newBlock);
+    res.send();
   });
 
   app.get('/peers', (req, res) => {

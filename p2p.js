@@ -35,6 +35,7 @@ function newConnectionHandler(ws) {
 function messageHandler(ws) {
   ws.on('message', (message) => {
     console.log(`message received: ${message}`);
+    // not yet implemented
   });
 }
 

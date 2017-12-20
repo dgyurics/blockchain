@@ -23,7 +23,7 @@ function calculateHash(index, previousHash, timestamp, data) {
 }
 
 function calculateBlockHash(block) {
-  return calculateHash(block.index, block.previousHash, block.timeStamp, block.data);
+  return calculateHash(block.index, block.previousHash, block.timestamp, block.data);
 }
 
 function getTimeStamp() {
@@ -33,10 +33,10 @@ function getTimeStamp() {
 function generateBlock(blockData) {
   let previousBlock = getLatestBlock();
   let nextIndex = previousBlock.index + 1;
-  let timeStamp = getTimeStamp();
-  let nextHash = calculateHash(nextIndex, previousBlock.hash, timeStamp, blockData);
+  let timestamp = getTimeStamp();
+  let nextHash = calculateHash(nextIndex, previousBlock.hash, timestamp, blockData);
 
-  return new Block(nextIndex, previousBlock.hash, timeStamp, blockData, nextHash);
+  return new Block(nextIndex, previousBlock.hash, timestamp, blockData, nextHash);
 }
 
 function getLatestBlock() {
@@ -61,7 +61,7 @@ function isValidChain(chain) {
 function addBlock(newBlock) {
   if (isValidNewBlock(newBlock, getLatestBlock())) {
     blockchain.push(newBlock);
-    p2p.broadcast('new block mined');
+    p2p.broadcast(newBlock);
   }
 }
 
