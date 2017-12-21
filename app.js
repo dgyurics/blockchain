@@ -61,7 +61,7 @@ function isValidChain(chain) {
 function addBlock(newBlock) {
   if (isValidNewBlock(newBlock, getLatestBlock())) {
     blockchain.push(newBlock);
-    p2p.broadcast(newBlock);
+    p2p.broadcastBlock(newBlock);
   }
 }
 

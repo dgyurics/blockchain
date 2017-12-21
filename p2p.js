@@ -4,11 +4,7 @@ let WebSocket = require('ws');
 
 const p2p_port = process.env.P2P_PORT || 6001;
 
-const message_types = Object.freeze({
-  GET_LATEST_BLOCK: Symbol('getLatestBlock'),
-  GET_ALL_BLOCKS: Symbol('getAllBlocks'),
-  BROADCAST_BLOCK: Symbol('broadcastBlock')
-});
+const message_types = Object.freeze({GET_LATEST_BLOCK: 0, GET_ALL_BLOCKS: 1, BROADCAST_BLOCK: 2});
 
 let sockets = [];
 
@@ -22,8 +18,6 @@ function init() {
 /* executed each time a new client connects */
 function newConnectionHandler(ws) {
   console.log('connection opened');
-
-  ws.send('You are now connected to the blockchain');
   sockets.push(ws);
 
   messageHandler(ws);
@@ -31,11 +25,25 @@ function newConnectionHandler(ws) {
   errorHandler(ws);
 }
 
-/* executed each time a message is sent */
+/* executed each time a message is received */
 function messageHandler(ws) {
-  ws.on('message', (message) => {
-    console.log(`message received: ${message}`);
-    // not yet implemented
+  ws.on('message', (data) => {
+    let message = JSON.parse(data);
+
+    switch (message.type) {
+      case message_types.GET_LATEST_BLOCK:
+        console.log('sending latest block')
+        break;
+      case message_types.GET_ALL_BLOCKS:
+        console.log('sending block chain')
+        break;
+      case message_types.BROADCAST_BLOCK:
+        console.log('received new block(s)')
+        break;
+      default:
+        console.log('unrecognized message type')
+        break;
+    }
   });
 }
 
@@ -68,20 +76,23 @@ function connectToPeers(newPeers) {
   })
 };
 
-/* convert message to string and broadcast to peer */
-function write(ws, message) {
-  ws.send(JSON.stringify(message));
-}
-
 /* broadcast message to all peers */
 function broadcast(message) {
   sockets.forEach(socket => {
-    write(socket, message);
+    socket.send(JSON.stringify(message));
   });
 }
 
+function broadcastBlock(block) {
+  let message = {
+    'type': message_types.BROADCAST_BLOCK,
+    'data': [block]
+  };
+  broadcast(message);
+}
+
 module.exports.message_types = message_types;
-module.exports.broadcast = broadcast;
+module.exports.broadcastBlock = broadcastBlock;
 module.exports.connectToPeers = connectToPeers;
 module.exports.init = init;
 module.exports.sockets = sockets;
