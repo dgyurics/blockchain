@@ -16,7 +16,7 @@ function init() {
   });
 
   app.get('/blocks', (req, res) => {
-    res.send(JSON.stringify(blockchain.blockchain))
+    res.send(JSON.stringify(blockchain.getBlockchain()))
   });
 
   app.post('/mineBlock', (req, res) => {
