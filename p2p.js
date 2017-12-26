@@ -74,8 +74,11 @@ function errorHandler(ws) {
 }
 
 function connectToPeers(newPeers) {
-  // FIXME only add peer if not already exists
   newPeers.forEach((newPeer) => {
+    // skip adding if connection already exists
+    if (sockets.find((socket) => socket.url === newPeer))
+      return;
+
     let ws = new WebSocket(newPeer);
 
     ws.on('open', () => {
