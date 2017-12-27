@@ -46,7 +46,6 @@ function generateBlock(blockData) {
   }
 
   console.log('block mined: ' + nextHash);
-
   return new Block(nextIndex, previousBlock.hash, timestamp, blockData, nextHash, nonce);
 }
 
@@ -78,7 +77,6 @@ function handleBlockchainSync(chain) {
 
   // only take action if current blockchain is behind received blockchain
   if (latestBlockReceived.index > currentLatestBlock.index) {
-
     if (latestBlockReceived.previousHash === currentLatestBlock.hash) {
 
       // TODO convert into function (multiple nested if statements == bad)
@@ -102,9 +100,8 @@ function getBlockchain() {
 
 function isValidChain(chain) {
   // validate genesis block
-  if (JSON.stringify(chain[0]) !== JSON.stringify(genesisBlock)) {
+  if (JSON.stringify(chain[0]) !== JSON.stringify(genesisBlock))
     return false;
-  }
 
   // validate remaining blocks
   let tempBlocks = [chain[0]];

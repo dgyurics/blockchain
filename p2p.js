@@ -18,11 +18,11 @@ function init() {
   let server = new WebSocket.Server({
     port: p2p_port
   });
+
   console.log('p2p port: ' + p2p_port);
   server.on('connection', ws => newConnectionHandler(ws));
 }
 
-/* executed each time a new client connects */
 function newConnectionHandler(ws) {
   console.log('connection opened');
   sockets.push(ws);
@@ -30,6 +30,8 @@ function newConnectionHandler(ws) {
   messageHandler(ws);
   exitHandler(ws);
   errorHandler(ws);
+
+  requestAllBlocks();
 }
 
 /* executed each time a message is received */
@@ -73,6 +75,7 @@ function errorHandler(ws) {
   })
 }
 
+/* executed each time a new client added */
 function connectToPeers(newPeers) {
   newPeers.forEach((newPeer) => {
     // skip adding if connection already exists
