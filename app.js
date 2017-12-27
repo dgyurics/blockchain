@@ -5,25 +5,27 @@ let p2p = require('./p2p');
 let http = require('./rest');
 
 let blockchain = []; // in-memory blockchain
+let difficulty = 4; // number of leading 0s required when mining new block
 
 class Block {
-  constructor(index, previousHash, timestamp, data, hash) {
+  constructor(index, previousHash, timestamp, data, hash, nonce = 0) {
     this.index = index;
     this.previousHash = previousHash;
     this.timestamp = timestamp;
     this.data = data;
     this.hash = hash;
+    this.nonce = nonce;
   }
 }
 
-const genesisBlock = new Block(0, '0', 1514173032339, 'genesis block', '422D5A84A79638E3565D5FDAF5DF1475606CE64D512F83227078737C655909E3');
+const genesisBlock = new Block(0, '0', 1514173032339, 'genesis block', '4B2FF30F85015FE5B0FC1E6408D8A8FF868BF4DF8C4E4422967F46A7CFC9A515');
 
-function calculateHash(index, previousHash, timestamp, data) {
-  return SHA256(index + previousHash + timestamp + data).toString();
+function calculateHash(index, previousHash, timestamp, data, nonce) {
+  return SHA256(index + previousHash + timestamp + data + nonce).toString();
 }
 
 function calculateBlockHash(block) {
-  return calculateHash(block.index, block.previousHash, block.timestamp, block.data);
+  return calculateHash(block.index, block.previousHash, block.timestamp, block.data, block.nonce);
 }
 
 function getTimeStamp() {
@@ -31,12 +33,25 @@ function getTimeStamp() {
 }
 
 function generateBlock(blockData) {
+  let nonce = 0;
   let previousBlock = getLatestBlock(blockchain);
   let nextIndex = previousBlock.index + 1;
   let timestamp = getTimeStamp();
-  let nextHash = calculateHash(nextIndex, previousBlock.hash, timestamp, blockData);
+  let nextHash = calculateHash(nextIndex, previousBlock.hash, timestamp, blockData, nonce);
 
-  return new Block(nextIndex, previousBlock.hash, timestamp, blockData, nextHash);
+  // perform proof of work aka mining
+  while (!isValidHash(nextHash, difficulty)) {
+    nonce++;
+    nextHash = calculateHash(nextIndex, previousBlock.hash, timestamp, blockData, nonce);
+  }
+
+  console.log('block mined: ' + nextHash);
+
+  return new Block(nextIndex, previousBlock.hash, timestamp, blockData, nextHash, nonce);
+}
+
+function isValidHash(hashString, difficulty) {
+  return hashString.substring(0, difficulty) == Array(difficulty + 1).join('0');
 }
 
 function getLatestBlock(chain) {
@@ -50,6 +65,8 @@ function isValidNewBlock(newBlock, previousBlock) {
     return false;
   if (calculateBlockHash(newBlock) !== newBlock.hash)
     return false;
+  if (!isValidHash(newBlock.hash, difficulty))
+    return false;
 
   return true;
 }
@@ -61,11 +78,15 @@ function handleBlockchainSync(chain) {
 
   // only take action if current blockchain is behind received blockchain
   if (latestBlockReceived.index > currentLatestBlock.index) {
+
     if (latestBlockReceived.previousHash === currentLatestBlock.hash) {
+
+      // TODO convert into function (multiple nested if statements == bad)
       if (isValidNewBlock(latestBlockReceived, getLatestBlock(blockchain))) {
         blockchain.push(latestBlockReceived);
         p2p.broadcastBlock(latestBlockReceived);
       }
+
     } else if (chain.length === 1) {
       p2p.requestAllBlocks();
     } else if (chain.length > blockchain.length && isValidChain(chain)) {
@@ -82,10 +103,10 @@ function getBlockchain() {
 function isValidChain(chain) {
   // validate genesis block
   if (JSON.stringify(chain[0]) !== JSON.stringify(genesisBlock)) {
-    console.log('genesis block mismatch, invalid blockchain');
     return false;
   }
 
+  // validate remaining blocks
   let tempBlocks = [chain[0]];
 
   for (let i = 1; i < chain.length; i++) {
